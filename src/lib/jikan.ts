@@ -98,7 +98,10 @@ export async function getDailyAnime(): Promise<AnimeData | null> {
   // Deterministic daily based on date - use a fixed list of popular anime IDs
   const popularIds = [1, 5, 6, 16, 20, 21, 30, 32, 33, 38, 44, 74, 136, 199, 227, 235, 269, 328, 430, 431, 437, 457, 552, 849, 918, 1535, 1575, 2001, 2025, 2904, 3588, 5114, 6547, 7054, 9253, 10620, 10740, 11061, 11757, 13601, 14719, 15417, 16498, 19815, 19817, 24765, 31240, 37779, 40028, 48583]
   const today = new Date()
-  const dateStr = `${today.getUTCFullYear()}${today.getUTCMonth()}${today.getUTCDate()}`
+  const year = today.getUTCFullYear()
+  const month = String(today.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(today.getUTCDate()).padStart(2, '0')
+  const dateStr = `${year}${month}${day}`
   const index = parseInt(dateStr) % popularIds.length
   return getAnimeById(popularIds[index])
 }

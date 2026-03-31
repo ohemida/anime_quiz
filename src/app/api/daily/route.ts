@@ -4,7 +4,10 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getDailyAnime } from '@/lib/jikan'
 
-// Returns the current date string in UTC+2 (Central European Summer Time / MEST)
+// Returns the current date string in CEST (UTC+2).
+// Note: This uses a fixed UTC+2 offset. During Central European Winter Time (CET, UTC+1),
+// dates will be shifted by one hour. For production, consider using a timezone library
+// (e.g. 'Intl.DateTimeFormat' with 'Europe/Berlin') for DST-aware handling.
 function getCestDateString(): string {
   const now = new Date()
   const cestOffsetMs = 2 * 60 * 60 * 1000
@@ -68,7 +71,7 @@ export async function POST(req: NextRequest) {
       const mestYesterday = new Date(yesterday.getTime() + cestOffsetMs)
       const yesterdayStr = mestYesterday.toISOString().split('T')[0]
 
-      if (user.lastDailyDate === yesterdayStr || user.lastDailyDate === today) {
+      if (user.lastDailyDate === yesterdayStr) {
         newStreak = user.currentStreak + 1
       } else {
         newStreak = 1
