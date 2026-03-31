@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  totalScore    Int      @default(0)
+  goldenTickets Int      @default(0)
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastDailyDate String?
+
+  gameSessions       GameSession[]
+  dailyParticipations DailyParticipation[]
+}
+
+model GameSession {
+  id        String   @id @default(cuid())
+  userId    String
+  mode      String
+  score     Int
+  maxScore  Int
+  hintsUsed Int      @default(0)
+  rounds    Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model DailyParticipation {
+  id         String   @id @default(cuid())
+  userId     String
+  date       String
+  score      Int      @default(0)
+  guesses    Int      @default(0)
+  completed  Boolean  @default(false)
+  wonTicket  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
