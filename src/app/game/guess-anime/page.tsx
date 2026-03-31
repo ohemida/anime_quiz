@@ -25,7 +25,7 @@ export default function GuessAnimePage() {
   const [guess, setGuess] = useState('')
   const [hintsUsed, setHintsUsed] = useState(0)
   const [revealPercent, setRevealPercent] = useState(10)
-  const [, setRoundScore] = useState<number | null>(null)
+  const [roundScore, setRoundScore] = useState<number | null>(null)
   const [totalScore, setTotalScore] = useState(0)
   const [roundScores, setRoundScores] = useState<number[]>([])
   const [gameOver, setGameOver] = useState(false)
@@ -184,6 +184,9 @@ export default function GuessAnimePage() {
       {feedback && (
         <div className={`rounded-xl p-4 text-center font-semibold ${feedback.startsWith('✅') ? 'bg-green-900/50 border border-green-600 text-green-300' : 'bg-red-900/50 border border-red-600 text-red-300'}`}>
           {feedback}
+          {roundScore !== null && roundScore > 0 && (
+            <p className="text-sm mt-1 opacity-80">Round score: {roundScore.toLocaleString()} pts</p>
+          )}
         </div>
       )}
 

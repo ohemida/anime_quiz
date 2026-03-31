@@ -4,10 +4,11 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getDailyAnime } from '@/lib/jikan'
 
-function getMestDateString(): string {
+// Returns the current date string in UTC+2 (Central European Summer Time / MEST)
+function getCestDateString(): string {
   const now = new Date()
-  const mestOffset = 2 * 60
-  const mestTime = new Date(now.getTime() + mestOffset * 60 * 1000)
+  const cestOffsetMs = 2 * 60 * 60 * 1000
+  const mestTime = new Date(now.getTime() + cestOffsetMs)
   return mestTime.toISOString().split('T')[0]
 }
 
@@ -22,7 +23,7 @@ export async function GET() {
     if (session?.user) {
       const userId = (session.user as { id?: string }).id
       if (userId) {
-        const today = getMestDateString()
+        const today = getCestDateString()
         participation = await prisma.dailyParticipation.findUnique({
           where: { userId_date: { userId, date: today } },
         })
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { score, guesses, completed } = await req.json()
-    const today = getMestDateString()
+    const today = getCestDateString()
 
     const existing = await prisma.dailyParticipation.findUnique({
       where: { userId_date: { userId, date: today } },
@@ -63,8 +64,8 @@ export async function POST(req: NextRequest) {
     if (completed) {
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
-      const mestOffset = 2 * 60
-      const mestYesterday = new Date(yesterday.getTime() + mestOffset * 60 * 1000)
+      const cestOffsetMs = 2 * 60 * 60 * 1000
+      const mestYesterday = new Date(yesterday.getTime() + cestOffsetMs)
       const yesterdayStr = mestYesterday.toISOString().split('T')[0]
 
       if (user.lastDailyDate === yesterdayStr || user.lastDailyDate === today) {
